@@ -27,17 +27,28 @@ class Signup(Resource):
         db.session.commit()
         return user.to_dict(), 201
 
-class CheckSession(Resource):
-    pass
-
 class Login(Resource):
-    pass
+    def post(self):
+        user = User.query.filter(User.username == request.json.get('username')).first()
+        session['user_id'] = user.id
+        return user.to_dict(), 200
 
 class Logout(Resource):
-    pass
+    def delete(self):
+        session['user_id'] = None
+        return {'message': '204: No Content'}, 204
+
+class CheckSession(Resource):
+    def get(self):
+        if user := User.query.filter(User.id == session.get('user_id')).first():
+            return user.to_dict(), 200
+        return {}, 204
 
 api.add_resource(ClearSession, '/clear', endpoint='clear')
 api.add_resource(Signup, '/signup', endpoint='signup')
+api.add_resource(Login, '/login', endpoint='login')
+api.add_resource(Logout, '/logout', endpoint='logout')
+api.add_resource(CheckSession, '/check_session', endpoint='check_session')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

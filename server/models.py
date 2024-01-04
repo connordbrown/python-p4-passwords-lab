@@ -10,7 +10,7 @@ class User(db.Model, SerializerMixin):
     username = db.Column(db.String)
     _password_hash = db.Column(db.String)
 
-    @hybrid_property
+    @property
     def password_hash(self):
         raise Exception('Password hashes may not be viewed.')
 
